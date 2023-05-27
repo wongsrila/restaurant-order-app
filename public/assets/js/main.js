@@ -1,34 +1,70 @@
 var socket = io();
 
-var messages = document.getElementById('messages');
-var form = document.getElementById('form');
-var input = document.getElementById('input');
+const tableInput = document.getElementById('tableInput');
+const joinButton = document.getElementById('joinButton');
+const itemInput = document.getElementById('itemInput');
+const addButton = document.getElementById('addButton');
+const saveButton = document.getElementById('saveButton');
+const itemList = document.getElementById('itemList');
+const intro = document.getElementById('intro');
+const form = document.getElementById('form');
 
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
-  if (input.value) {
-    socket.emit('chat message', input.value);
-    input.value = '';
-  }
+let currentTable = null;
+
+joinButton.onclick = () => {
+  intro.style.display = 'none';
+  form.style.display = 'block';
+
+  currentTable = tableInput.value;
+  socket.emit('joinTable', currentTable);
+  tableInput.value = '';
+};
+
+addButton.onclick = () => {
+  const item = itemInput.value;
+  socket.emit('addItem', { table: currentTable, item });
+  itemInput.value = '';
+};
+
+saveButton.onclick = () => {
+  socket.emit('saveList', currentTable);
+};
+
+socket.on('addItem', (item) => {
+  const li = document.createElement('li');
+  li.textContent = item;
+  itemList.appendChild(li);
 });
 
-socket.on('chat message', function (msg) {
-  var item = document.createElement('li');
-  item.textContent = msg;
-  messages.appendChild(item);
-  window.scrollTo(0, document.body.scrollHeight);
-});
+// var messages = document.getElementById('messages');
+// var form = document.getElementById('form');
+// var input = document.getElementById('input');
 
-socket.on('intial', function (order) {
-  const items = order.items;
+// form.addEventListener('submit', function (e) {
+//   e.preventDefault();
+//   if (input.value) {
+//     socket.emit('chat message', input.value);
+//     input.value = '';
+//   }
+// });
 
-  items.forEach((item) => {
-    console.log(item.name);
-    var liEl = document.createElement('li');
-    liEl.textContent = `${item.name}`;
-    messages.appendChild(liEl);
-  });
-});
+// socket.on('chat message', function (msg) {
+//   var item = document.createElement('li');
+//   item.textContent = msg;
+//   messages.appendChild(item);
+//   window.scrollTo(0, document.body.scrollHeight);
+// });
+
+// socket.on('intial', function (order) {
+//   const items = order.items;
+
+//   items.forEach((item) => {
+//     console.log(item.name);
+//     var liEl = document.createElement('li');
+//     liEl.textContent = `${item.name}`;
+//     messages.appendChild(liEl);
+//   });
+// });
 
 // function joinTable() {
 //   const tableId = document.getElementById('table-id').value;

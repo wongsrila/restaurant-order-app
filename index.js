@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const mongoose = require('mongoose');
-const { Order, Table } = require('./models');
+// const { Order, Table } = require('./models');
 const { sendFile } = require('express/lib/response');
 const path = require('path');
 const { disconnect } = require('process');
@@ -24,18 +24,51 @@ app.get('/', (req, res) => {
   res.sendFile('/index.html');
 });
 
-io.on('connection', async (socket) => {
-  const order = await Order.findOne({ table: 1234 });
+const ListSchema = new mongoose.Schema({
+  table: String,
+  items: [String],
+});
 
-  io.to(socket.id).emit('intial', order);
+const List = mongoose.model('List', ListSchema);
 
-  socket.on('chat message', async (msg) => {
-    const order = await Order.findOne({ table: 1234 });
-    order.items.push({ name: msg, quantity: 1 });
-    order.save();
-    io.emit('chat message', msg);
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('joinTable', (table) => {
+    socket.join(table);
+    console.log(`Client joined table ${table}`);
+  });
+
+  socket.on('addItem', ({ table, item }) => {
+    io.to(table).emit('addItem', item);
+    console.log(`Item ${item} added to table ${table}`);
+  });
+
+  socket.on('saveList', async (table) => {
+    const items = io.sockets.adapter.rooms.get(table);
+    console.log(items);
+    // const list = new List({ table, items });
+    // await list.save();
+    // console.log(`List for table ${table} saved`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
   });
 });
+
+// io.on('connection', async (socket) => {
+//   const order = await Order.findOne({ table: 1234 });
+
+//   io.to(socket.id).emit('intial', order);
+
+//   socket.on('chat message', async (msg) => {
+//     const order = await Order.findOne({ table: 1234 });
+//     order.items.push({ name: msg, quantity: 1 });
+//     order.save();
+//     io.emit('chat message', msg);
+//   });
+// });
 
 // const cart = [];
 
@@ -80,5 +113,5 @@ io.on('connection', async (socket) => {
 // });
 
 server.listen(2333, () => {
-  console.log('Server is running on port 3000');
+  console.log('Server is running on port 2333');
 });

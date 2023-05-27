@@ -19,10 +19,26 @@
     <h1>Add an Item</h1> -->
     <!-- <input type="text" id="item-name" placeholder="Item Name" />
     <button onclick="addItem()">Add</button> -->
-    <ul id="messages"></ul>
+
+    <!-- <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+    </form> -->
+
+    <h1>Simple List App</h1>
+    <div id="intro">
+      <input id="tableInput" type="text" placeholder="Enter table name" />
+      <button id="joinButton">Join Table</button>
+    </div>
+
+    <div id="form">
+      <input id="itemInput" type="text" placeholder="Enter item" />
+      <button id="addButton">Add Item</button>
+
+      <button id="saveButton">Save List</button>
+    </div>
+
+    <ul id="itemList"></ul>
     <script src="/socket.io/socket.io.js"></script>
     <script src="./assets/js/main.js"></script>
   </body>
